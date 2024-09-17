@@ -5,6 +5,8 @@ use {
         MAX_CPI_ACCOUNT_INFOS, MAX_CPI_INSTRUCTION_ACCOUNTS, MAX_CPI_INSTRUCTION_DATA_LEN,
     },
 };
+use std::cell::UnsafeCell;
+
 
 struct CallerAccount<'a> {
     lamports: &'a mut u64,
@@ -522,7 +524,8 @@ impl<'a, 'b> SyscallInvokeSigned<'a, 'b> for SyscallInvokeSignedC<'a, 'b> {
                 vm_addr,
                 size_of::<u64>() as u64,
             )?;
-            let ref_to_len_in_vm = unsafe { &mut *(addr as *mut u64) };
+            //let ref_to_len_in_vm = unsafe { &mut *(addr as *mut u64) };
+            let ref_to_len_in_vm = unsafe { &mut *(UnsafeCell::new(addr as u64).get()) };
 
             Ok(CallerAccount {
                 lamports,
